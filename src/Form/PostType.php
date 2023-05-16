@@ -13,6 +13,7 @@ namespace App\Form;
 
 use App\Entity\Post;
 use App\Form\Type\DateTimePickerType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use App\Form\Type\TagsInputType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -60,11 +61,14 @@ class PostType extends AbstractType
                 'help' => 'help.post_summary',
                 'label' => 'label.summary',
             ])
-            ->add('content', null, [
+			->add('addNewCard', ButtonType::class, [
+				'label' => 'Add New Card'			
+			])
+            /*->add('content', null, [
                 'attr' => ['rows' => 20],
                 'help' => 'help.post_content',
                 'label' => 'label.content',
-            ])
+            ])*/
             ->add('publishedAt', DateTimePickerType::class, [
                 'label' => 'label.published_at',
                 'help' => 'help.post_publication',

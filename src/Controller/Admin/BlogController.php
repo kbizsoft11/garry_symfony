@@ -12,8 +12,10 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Post;
+use App\Entity\PostCard;
 use App\Entity\User;
 use App\Form\PostType;
+use App\Form\CardPostType;
 use App\Repository\PostRepository;
 use App\Security\PostVoter;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,6 +27,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Doctrine\Persistence\ManagerRegistry as PersistenceManagerRegistry;
 
 /**
  * Controller used to manage blog contents in the backend.
@@ -57,9 +60,9 @@ class BlogController extends AbstractController
     public function index(
         #[CurrentUser] User $user,
         PostRepository $posts,
-    ): Response {
+    ): Response {   
         $authorPosts = $posts->findBy(['author' => $user], ['publishedAt' => 'DESC']);
-
+        
         return $this->render('admin/blog/index.html.twig', ['posts' => $authorPosts]);
     }
 
@@ -78,7 +81,7 @@ class BlogController extends AbstractController
     ): Response {
         $post = new Post();
         $post->setAuthor($user);
-
+       
         // See https://symfony.com/doc/current/form/multiple_buttons.html
         $form = $this->createForm(PostType::class, $post)
             ->add('saveAndCreateNew', SubmitType::class)
@@ -86,13 +89,31 @@ class BlogController extends AbstractController
 
         $form->handleRequest($request);
 
+        $post_card = new PostCard();
+        $card_form = $this->createForm(CardPostType::class, $post_card)
+        ->add('saveAndCreateNew', SubmitType::class);
+
+        $card_form->handleRequest($request);
+        //gettitlecard
+        
+       
         // the isSubmitted() method is completely optional because the other
         // isValid() method already checks whether the form is submitted.
         // However, we explicitly add it to improve code readability.
         // See https://symfony.com/doc/current/forms.html#processing-forms
-        if ($form->isSubmitted() && $form->isValid()) {
+
+        /***code for card save data start */
+        
+        
+        //if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted()) {
+           
+            $post->setContent('');
             $entityManager->persist($post);
             $entityManager->flush();
+            
+            $getpost_id = $post->getId();
+           
 
             // Flash messages are used to notify the user about the result of the
             // actions. They are deleted automatically from the session as soon
@@ -101,7 +122,39 @@ class BlogController extends AbstractController
             $this->addFlash('success', 'post.created_successfully');
 
             /** @var SubmitButton $submit */
-            $submit = $form->get('saveAndCreateNew');
+            $submit = $form->get('saveAndCreateNew'); 
+
+			
+            $cart_content_count = $request->request->get('card_data');
+            //save card data to new table
+            $cart_content_count = $request->request->get('card_data');
+            if($getpost_id!=''){
+                if($cart_content_count!=''){
+                    $cart_content_count = $request->request->get('card_data');
+                    for($ik = 1; $ik<=$cart_content_count;$ik++){
+
+                        $card_title = $request->request->get('card_title'.$ik);
+                        $card_image = $request->request->get('card_image'.$ik);
+                        $card_paragraph = $request->request->get('card_paragraph'.$ik);
+                        $card_template = $request->request->get('card_template'.$ik);
+                        $create_para_ary = explode(',',$card_paragraph);
+                    
+                        $json_paragraph = json_encode($create_para_ary);
+
+                        $post_card = new PostCard();
+                        $post_card->setCardTitle($card_title);
+                        $post_card->setcardImage($card_image);
+                        $post_card->setparagraph($json_paragraph);
+                        $post_card->setTemplate($card_template);
+                        $post_card->setPostId($getpost_id);
+                        $entityManager->persist($post_card);
+                        $entityManager->flush();
+
+                    }
+                    
+                }
+            }
+            /***code for card save data end */
 
             if ($submit->isClicked()) {
                 return $this->redirectToRoute('admin_post_new');
@@ -113,6 +166,7 @@ class BlogController extends AbstractController
         return $this->render('admin/blog/new.html.twig', [
             'post' => $post,
             'form' => $form,
+            'card_form' => $card_form
         ]);
     }
 
@@ -120,14 +174,32 @@ class BlogController extends AbstractController
      * Finds and displays a Post entity.
      */
     #[Route('/{id<\d+>}', name: 'admin_post_show', methods: ['GET'])]
-    public function show(Post $post): Response
+    public function show(Post $post, EntityManagerInterface $entityManager): Response
     {
         // This security check can also be performed
         // using a PHP attribute: #[IsGranted('show', subject: 'post', message: 'Posts can only be shown to their authors.')]
         $this->denyAccessUnlessGranted(PostVoter::SHOW, $post, 'Posts can only be shown to their authors.');
 
-        return $this->render('admin/blog/show.html.twig', [
+       //get postcard data and modify the array
+
+        $repository = $entityManager->getRepository(PostCard::class);
+       
+        $postcard_data = $repository->findBy(['post_id' => $post->getId()],array('sorting_new' => 'ASC'));
+
+        $card_array=array();
+        
+        if(!empty($postcard_data)){
+            foreach($postcard_data as $podata){
+                $card_id = $podata->getId();
+                $data_json = json_decode($podata->getParagraph());
+                $card_array[$card_id] = array("card_id"=>$podata->getId(),"card_title"=>$podata->getCardTitle(),"card_image"=>$podata->getCardImage(),"template"=>$podata->getTemplate(),'paragraph_n'=>$data_json);                     
+            }
+        }
+       
+         //get postcard data end
+        return $this->render('admin/blog/show.html.twig', [ 
             'post' => $post,
+            'card_data' => $card_array,
         ]);
     }
 
@@ -141,6 +213,10 @@ class BlogController extends AbstractController
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
 
+        $postcard = new PostCard();
+        $second_form = $this->createForm(CardPostType::class, $postcard);
+        $second_form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
             $this->addFlash('success', 'post.updated_successfully');
@@ -148,10 +224,44 @@ class BlogController extends AbstractController
             return $this->redirectToRoute('admin_post_edit', ['id' => $post->getId()]);
         }
 
+        
+        
+        $data = $second_form->getData();
+        
+        if ($second_form->isSubmitted()) {
+            $paragraph = $_REQUEST['paragraph'];
+            $post_id = $second_form["post_id"]->getData();
+            $paragraph_new = json_encode($paragraph);
+           
+            $postcard->setPostId($post_id);
+            
+            $postcard->setParagraph($paragraph_new);  
+            $entityManager->persist($postcard);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('admin_post_edit', ['id' => $post->getId()]);
+        }
+
+        $repository = $entityManager->getRepository(PostCard::class);
+        // get by postid
+        $postcard_data = $repository->findBy(['post_id' => $post->getId()],array('sorting_new' => 'ASC'));
+       
+        $card_array=array();
+        if(!empty($postcard_data)){
+			foreach($postcard_data as $podata){
+				$card_id = $podata->getId();
+				$data_json = json_decode($podata->getParagraph());
+				$card_array[$card_id] = array("card_id"=>$podata->getId(),"card_title"=>$podata->getCardTitle(),"card_image"=>$podata->getCardImage(),"template"=>$podata->getTemplate(),'paragraph_n'=>$data_json);                       
+			}
+		}
+      
         return $this->render('admin/blog/edit.html.twig', [
             'post' => $post,
             'form' => $form,
-        ]);
+            'card_form' => $second_form,
+            'card_data' => $card_array
+        ]);  
+
     }
 
     /**
@@ -180,4 +290,80 @@ class BlogController extends AbstractController
 
         return $this->redirectToRoute('admin_post_index');
     }
+
+    #[Route('/{id}/deletepostcard', name: 'admin_post_card_delete', methods: ['GET', 'POST'])]
+    public function deletePostCard(Request $request, Postcard $postcard, EntityManagerInterface $entityManager, PersistenceManagerRegistry $doctrine, $id): Response
+    {     
+        $entityManager = $doctrine->getManager();
+        $postcard = $entityManager->getRepository(Postcard::class)->find($id);
+
+        if (!$postcard) {
+            throw $this->createNotFoundException('The post card does not exist');
+            
+        }
+		
+		
+        $entityManager->remove($postcard);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('admin_post_index');
+    }
+
+    #[Route('/{id}/editpostcard', name: 'admin_post_card_edit', methods: ['GET', 'POST'])]
+
+    public function editPostCard(Request $request, PersistenceManagerRegistry $doctrine, $id)
+    {
+        $entityManager = $doctrine->getManager();
+        $postcard = $entityManager->getRepository(Postcard::class)->find($id);
+
+        $postcard_new = new PostCard();
+        $second_form = $this->createForm(CardPostType::class, $postcard_new);
+        $second_form->handleRequest($request);
+
+        if (!$postcard) {
+            throw $this->createNotFoundException('The postcard does not exist');
+        }
+
+        $card_title = $_REQUEST['cardTitle'];
+        
+        $paragraph = $_REQUEST['paragraph'];
+        $paragraph_new = json_encode($paragraph);
+
+       
+        $card_image = $_REQUEST["cardImage"];
+        $paragraph = $_REQUEST["paragraph"];
+        $template = $_REQUEST["template"];
+       
+        $post_id = $_REQUEST["post_id"];
+        $paragraph_new = json_encode($paragraph);
+       
+      
+        $postcard->setCardTitle($card_title);
+        $postcard->setcardImage($card_image);
+        $postcard->setparagraph($paragraph_new);
+        $postcard->setTemplate($template);
+        $entityManager->flush(); 
+       
+       // return $this->redirectToRoute('admin/post/'.$post_id.'/edit', ['id' => $id]);   
+        return $this->redirectToRoute('admin_post_edit', ['id' => $post_id]);    
+    }
+
+    #[Route('/{id}/editpostcardposition', name: 'admin_post_card_edit_position', methods: ['GET', 'POST'])]
+
+    public function editPostCardPosition(Request $request, PersistenceManagerRegistry $doctrine, $id)
+    {
+        $card_ids = $_REQUEST['card_ids'];
+        $entityManager = $doctrine->getManager();
+        $key = 1;
+        foreach($card_ids as $cids){
+            $postcard = $entityManager->getRepository(Postcard::class)->find($cids); 
+            echo $key;          
+            $postcard->setSortingNew($key);
+            $entityManager->flush(); 
+            $key++;
+        }
+        die;
+    }
+   
 }
+    

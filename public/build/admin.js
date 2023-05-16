@@ -45,6 +45,88 @@ $(function () {
       close: 'fa fa-remove'
     }
   });
+ 
+  // code for the admin card start
+	var modal = document.getElementById("modal_card_post");
+	var btn = document.getElementById("post_addNewCard");
+	var span = document.getElementsByClassName("close")[0];
+
+	btn.onclick = function() {
+		console.log("kushal add");
+		
+		modal.style.display = "block";
+	}
+ 
+	span.onclick = function() {
+		modal.style.display = "none";
+	}
+	var para_count = 2;
+	$(".add_paragraph").click(function(){
+		var html_append = '<div class="form-group">'; 
+		html_append += '<label class="control-label required" for="post_title">Paragraph '+para_count+'</label>'; 
+		html_append += '<input type="text" name="paragraph[]" required="required" autofocus="autofocus" class="form-control card_paragraph" />';
+		html_append += '</div>'; 
+		$(".other_paragraph").append(html_append);
+		para_count++;
+	});
+    var cart_content_count = 1;
+	$(document).on('click', '.add_card_post', function(){ 
+		var gettitle = $('#card_post_cardTitle').val();
+		var card_post_cardImage = $('#card_post_cardImage').val();
+		var card_paragraph = $('.card_paragraph').val();
+		var card_post_template = $('#card_post_template').val();
+		
+		console.log(gettitle);
+		
+		if(gettitle=='' || card_post_cardImage=='' || card_paragraph=='' || card_post_template==''){
+			$('#modal_card_post .error').text("Please fill all fields data");
+			return false;
+		}
+
+		//data append
+		console.log(cart_content_count);
+		var card_paradata = [];
+
+		$('.card_paragraph').each(function() {		
+			var card_paragraph = $(this).val(); 
+			card_paradata.push(card_paragraph);
+		});
+		
+		var para_data = card_paradata.toString();
+
+		var html_append = '<div class="form-group">';  
+		html_append += '<input type="hidden" class="control-label required card_data_count" name="card_data" value='+cart_content_count+'>'; 
+		html_append += '<input type="hidden" class="control-label required" name="card_title'+cart_content_count+'" value="'+gettitle+'">';
+		html_append += '<input type="hidden" class="control-label required" name="card_image'+cart_content_count+'" value="'+card_post_cardImage+'">'; 
+		html_append += '<input type="hidden" class="control-label required" name="card_paragraph'+cart_content_count+'" value="'+para_data+'">'; 
+		html_append += '<input type="hidden" class="control-label required" name="card_template'+cart_content_count+'" value="'+card_post_template+'">';
+		html_append += '</div>';
+		html_append += '<div class="col-sm-4">';
+		html_append += '<div class="inner-card-data">';
+		html_append += '<div class="cars-box-img"><img height="200" src="'+card_post_cardImage+'" class="img-rounded" alt="'+gettitle+'"></div>';
+		html_append += '<div class="card-box-content">';
+		html_append += '<p>'+card_paragraph+'</p>';
+		html_append += '</div>';
+		html_append += '<div class="row"><span class="col-sm-12"><p class="ad_layout">Ad Layout: '+card_post_template+'</p></span>';
+		html_append += '</div>';
+		html_append += '</div>';
+		
+		html_append += '</div>';
+		var card_post_template = $('.card_data_count').val(cart_content_count);
+		$(".card_content_add").append(html_append);
+		cart_content_count++;
+		
+	});
+
+// When the user clicks anywhere outside of the modal, close it
+	window.onclick = function(event) {
+	if (event.target == modal) {
+		modal.style.display = "none";
+	}
+	}
+	
+
+  // code for the admin card end
 
   // Bootstrap-tagsinput initialization
   // https://bootstrap-tagsinput.github.io/bootstrap-tagsinput/examples/
@@ -80,6 +162,35 @@ $(document).on('submit', 'form[data-confirmation]', function (event) {
       $form.submit();
     }).modal('show');
   }
+});
+//save post
+$(document).on('click', '#sidebar .btn-success', function (event) {
+	event.preventDefault();
+	var post_id = $("#post_id_n").val();
+	var link = $(this).attr('href');    
+	console.log(link);
+	var card_iddata = [];
+	$('#sortable .inner-card-data').each(function() {		
+		var card_id = $(this).attr('card_id'); 
+		card_iddata.push(card_id);
+	});
+	
+
+	var postForm = { //Fetch form data
+		'post_id'     : post_id,'card_ids'     : card_iddata
+	};
+
+	$.ajax({ //Process the form using $.ajax()
+		type      : 'POST', //Method type
+		url       : '/en/admin/post/'+post_id+'/editpostcardposition', //Your form processing file URL
+		data      : postForm, //Forms name
+		dataType  : 'json',
+		success   : function(data) {
+						
+					}
+	});
+	window.location.href=link;
+	
 });
 
 /***/ }),

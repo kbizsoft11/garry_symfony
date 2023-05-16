@@ -1,0 +1,23 @@
+ <div id="modal_card_post" class="modal modal_cards custom_add_post_model">
+        <!-- Modal card data -->
+        <div class="modal-content">
+            <span class="close">&times;</span>
+
+            {{ form_start(card_form, {attr: attr|default({})}) }}
+                {{ form_row(card_form.cardTitle) }}
+                {{ form_row(card_form.cardImage) }}
+                {{ form_row(card_form.paragraph,{attr:{'class': 'card_paragraph'}}) }}
+                
+                <div class="other_paragraph"></div>
+
+                <a href="javascript:void(0);" class="{{ button_css|default("btn btn-primary add_paragraph") }}">
+                    Add New Paragraph 
+                </a>
+
+            {{ form_end(card_form) }} 
+            <div><label class="error"></label></div>
+            <a href="javascript:void(0);" class="{{ button_css|default("btn btn-primary add_card_post") }}">
+                <i class="fa fa-save" aria-hidden="true"></i> Add Card
+            </a>
+        </div>
+    </div>

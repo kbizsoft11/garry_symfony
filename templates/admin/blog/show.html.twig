@@ -14,7 +14,31 @@
         <p class="m-b-0"><strong>{{ 'label.summary'|trans }}</strong>: {{ post.summary }}</p>
     </div>
 
-    {{ post.content|markdown_to_html|sanitize_html }}
+    <!--{{ post.content|markdown_to_html|sanitize_html }} -->
+	
+	{% if card_data|length > 0 %}
+        <div class="form-group">
+			<div id="sortable" class="row cards-row thumbnail-sortable ">
+			
+		 
+				{% for cards in card_data %}
+			
+					<div class="col-sm-4">
+						<div card_id="{{cards.card_id}}" class="inner-card-data">
+                            <h4>{{cards.card_title}}</h4>
+						   <div class="cars-box-img"><img height="200" src="{{cards.card_image}}" class="img-rounded" alt="{{cards.card_title}}"></div>
+						   <div class="card-box-content"> 
+                                {% for card_p in cards.paragraph_n %}
+                                    <p>{{card_p}}</p>
+                                {% endfor %}
+							</div>
+						</div>  
+					</div>
+				{% endfor %}
+			
+			</div>
+        </div>
+    {% endif %}
 
     {{ include('blog/_post_tags.html.twig') }}
 {% endblock %}

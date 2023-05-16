@@ -7,6 +7,9 @@
 
     {{ include('admin/blog/_form.html.twig', {
         form: form,
+		card_form: card_form,
+		post_id_card: post.id,
+        card_data : card_data,
         button_label: 'action.save'|trans,
         include_back_to_home_link: true,
     }, with_context = false) }}
@@ -20,7 +23,7 @@
     </div>
 
     <div class="section actions">
-        {{ include('admin/blog/_delete_form.html.twig', {post: post}, with_context = false) }}
+        {{ include('admin/blog/_delete_form.html.twig') }}
     </div>
 
     {{ parent() }}
