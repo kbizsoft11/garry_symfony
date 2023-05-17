@@ -10,7 +10,21 @@
         <span class="metadata"><i class="fa fa-user"></i> {{ post.author.fullName }}</span>
     </p>
 
-    {{ post.content|markdown_to_html|sanitize_html }}
+    <div class="col-sm-12">
+        {% for cards in card_data %}
+            <div class="col-sm-4">
+                <div card_id="{{cards.card_id}}" class="inner-card-data">
+                    <h4>{{cards.card_title}}</h4>
+                    <div class="cars-box-img"><img height="200" src="{{cards.card_image}}" class="img-rounded" alt="{{cards.card_title}}"></div>
+                    <div class="card-box-content"> 
+                        {% for card_p in cards.paragraph_n %}
+                            <p>{{card_p}}</p>
+                        {% endfor %}
+                    </div>
+                </div>  
+            </div>
+        {% endfor %}
+    </div>
 
     {{ include('blog/_post_tags.html.twig') }}
 

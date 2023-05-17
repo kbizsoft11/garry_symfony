@@ -13,6 +13,7 @@ namespace App\Controller;
 
 use App\Entity\Comment;
 use App\Entity\Post;
+use App\Entity\PostCard;
 use App\Entity\User;
 use App\Event\CommentCreatedEvent;
 use App\Form\CommentType;
@@ -73,7 +74,7 @@ class BlogController extends AbstractController
      * See https://symfony.com/doc/current/bundles/SensioFrameworkExtraBundle/annotations/converters.html
      */
     #[Route('/posts/{slug}', name: 'blog_post', methods: ['GET'])]
-    public function postShow(Post $post): Response
+    public function postShow(Post $post, EntityManagerInterface $entityManager): Response
     {
         // Symfony's 'dump()' function is an improved version of PHP's 'var_dump()' but
         // it's not available in the 'prod' environment to prevent leaking sensitive information.
@@ -88,8 +89,22 @@ class BlogController extends AbstractController
         //
         // You can also leverage Symfony's 'dd()' function that dumps and
         // stops the execution
+		
+		$repository = $entityManager->getRepository(PostCard::class);
+        // get by postid
+        $postcard_data = $repository->findBy(['post_id' => $post->getId()],array('sorting_new' => 'ASC'));
 
-        return $this->render('blog/post_show.html.twig', ['post' => $post]);
+        $card_array=array();
+        
+        if(!empty($postcard_data)){
+            foreach($postcard_data as $podata){
+                $card_id = $podata->getId();
+                $data_json = json_decode($podata->getParagraph());
+                $card_array[$card_id] = array("card_id"=>$podata->getId(),"card_title"=>$podata->getCardTitle(),"card_image"=>$podata->getCardImage(),"template"=>$podata->getTemplate(),'paragraph_n'=>$data_json);                      
+            }
+        }
+
+        return $this->render('blog/post_show.html.twig', ['post' => $post,'card_data' => $card_array]);
     }
 
     /**
