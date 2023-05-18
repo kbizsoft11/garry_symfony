@@ -193,6 +193,30 @@ $(document).on('click', '#sidebar .btn-success', function (event) {
 	
 });
 
+//delete card para
+$(document).on('click', '.delete-post-para', function (event) {
+	event.preventDefault();
+	if(confirm("Do you want to delete?")) {
+		var card_id = $(this).attr('data-post-card-id');	
+		var para_id = $(this).attr('para_id');    
+		
+		var postForm = { //Fetch form data
+			'card_id'     : card_id,'para_id'     : para_id
+		};
+		console.log("xcv");
+		$.ajax({ //Process the form using $.ajax()
+			type      : 'POST', //Method type
+			url       : '/en/admin/post/'+card_id+'/delete_card_para', //Your form processing file URL
+			data      : postForm, //Forms name
+			dataType  : 'json',
+			success   : function(data) {
+							
+						}
+		});
+		location.reload();
+	}		
+});
+
 /***/ }),
 
 /***/ "./assets/styles/admin.scss":
