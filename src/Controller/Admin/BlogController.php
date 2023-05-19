@@ -296,7 +296,7 @@ class BlogController extends AbstractController
     {     
         $entityManager = $doctrine->getManager();
         $postcard = $entityManager->getRepository(Postcard::class)->find($id);
-
+		$postId = $request->request->get('postId');
         if (!$postcard) {
             throw $this->createNotFoundException('The post card does not exist');
             
@@ -305,8 +305,8 @@ class BlogController extends AbstractController
 		
         $entityManager->remove($postcard);
         $entityManager->flush();
-
-        return $this->redirectToRoute('admin_post_index');
+		return $this->redirectToRoute('admin_post_edit', ['id' => $postId]);   
+        //return $this->redirectToRoute('admin_post_index');
     }
 
     #[Route('/{id}/editpostcard', name: 'admin_post_card_edit', methods: ['GET', 'POST'])]
