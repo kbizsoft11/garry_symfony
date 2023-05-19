@@ -135,6 +135,11 @@ class BlogController extends AbstractController
 
                         $card_title = $request->request->get('card_title'.$ik);
                         $card_image = $request->request->get('card_image'.$ik);
+                       /*  $card_image = $request->request->get('card_image'.$ik)->getData();
+						echo "<pre>";
+						print_r($card_image);
+						die; */
+						//$brochureFile = $request->request->get('brochure')->getData();
                         $card_paragraph = $request->request->get('card_paragraph'.$ik);
                         $card_template = $request->request->get('card_template'.$ik);
                         $create_para_ary = explode(',',$card_paragraph);
@@ -389,6 +394,19 @@ class BlogController extends AbstractController
 		$return_arr = array("message" => 'success'); 
 		 
 		echo json_encode($return_arr);
+		die;
+    }
+	//card image upload
+	#[Route('/card_image', name: 'admin_post_card_image', methods: ['GET', 'POST'])]
+
+    public function cardImage(Request $request, PersistenceManagerRegistry $doctrine)
+    {
+		$filename = $_FILES['file']['name'];
+		$target='images/'.basename($_FILES['file']['name']);
+		if(move_uploaded_file($_FILES['file']['tmp_name'],$target)){
+			$status = 1;             				
+		}
+		echo"done";
 		die;
     }
 	

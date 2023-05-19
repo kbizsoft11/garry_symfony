@@ -65,7 +65,7 @@ $(function () {
 		var html_append = '<div class="form-group form_group_'+para_count+'">'; 
 		html_append += '<label class="control-label required" for="post_title">Paragraph '+para_count+'</label>'; 
 		html_append += '<div class="col-sm-11 cus_par"><input type="text" name="paragraph[]" required="required" autofocus="autofocus" class="form-control card_paragraph" /></div>';
-		html_append += '<div class="col-sm-1"><span class="add-delete-buttons"><button type="button" class="add-post-para-delete btn btn-danger btn-sm btn_para_'+para_count+'" para_id = "'+para_count+'"> <i class="fas fa-times-circle"></i></button></span></div>';
+		html_append += '<div class="col-sm-1"><span class="add-delete-buttons"><a href="javascript:void(0);" class="add-post-para-delete btn btn-danger btn-sm btn_para_'+para_count+'" para_id = "'+para_count+'"> <i class="fas fa-times-circle"></i></a></span></div>';
 		html_append += '</div>'; 
 		$(".other_paragraph").append(html_append);
 		para_count++;
@@ -104,7 +104,7 @@ $(function () {
 		html_append += '</div>';
 		html_append += '<div class="col-sm-4">';
 		html_append += '<div class="inner-card-data">';
-		html_append += '<div class="cars-box-img"><img height="200" src="'+card_post_cardImage+'" class="img-rounded" alt="'+gettitle+'"></div>';
+		html_append += '<h4>'+gettitle+'</h4><div class="cars-box-img"><img height="200" src="'+card_post_cardImage+'" class="img-rounded" alt="'+gettitle+'"></div>';
 		html_append += '<div class="card-box-content">';
 		html_append += '<p>'+card_paragraph+'</p>';
 		html_append += '</div>';

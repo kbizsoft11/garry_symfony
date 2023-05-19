@@ -8,9 +8,11 @@
     {{ form_start(form) }}
         {{ form_row(form.title) }}
         {{ form_row(form.summary) }}
-		{{ form_row(form.addNewCard) }}
 		<div class="form-group"><div class="card_content_add"></div></div>
 		<br/><div class="rest_content">
+		{{ form_row(form.addNewCard) }}
+		
+		
 			{{ form_row(form.publishedAt) }}
 			{{ form_row(form.tags) }}
 		</div>

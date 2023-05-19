@@ -13,6 +13,7 @@
 	use Symfony\Component\String\Slugger\SluggerInterface;
     use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
     use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+	use Symfony\Component\Form\Extension\Core\Type\FileType;
 
     class CardPostType extends AbstractType
     {
