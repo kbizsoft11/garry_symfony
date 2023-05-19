@@ -11,7 +11,7 @@
     {{ include('blog/_delete_post_confirmation.html.twig') }}
 {% endif %}
 
-{{ form_start(form, {attr: attr|default({})}) }}
+{{ form_start(form, {attr: { 'class': 'post_form' }}) }}
     {{ form_row(form.title) }}
     {{ form_row(form.summary) }}
 	
@@ -31,7 +31,9 @@
 							
 							<div class="cars-box-img"><img height="200" src="{{cards.card_image}}" class="img-rounded" alt="{{cards.card_title}}"></div>
 						   <div class="card-box-content"> 
-								<p>{{cards.paragraph_n[0]}}</p>
+								{% if(cards.paragraph_n) %}								
+									<p>{{cards.paragraph_n[0]}}</p>
+								{% endif %}
 								<div class="row">
 									<span class="col-sm-6">
 										Ad Layout: {{cards.template}}
@@ -56,7 +58,7 @@
     {{ form_row(form.publishedAt) }}
     {{ form_row(form.tags) }}
 
-    <button type="submit" class="{{ button_css|default("btn btn-primary") }}">
+    <button type="submit" class="{{ button_css|default("btn btn-primary") }} post_submit_btn">
         <i class="fa fa-save" aria-hidden="true"></i> {{ button_label|default('label.create_post'|trans) }}
     </button>
 

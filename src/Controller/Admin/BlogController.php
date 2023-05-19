@@ -385,6 +385,32 @@ class BlogController extends AbstractController
        
         $postcard->setparagraph($paragraph_new);
         $entityManager->flush(); 
+		
+		$return_arr = array("message" => 'success'); 
+		 
+		echo json_encode($return_arr);
+		die;
+    }
+	
+	//delete all paragraph of cards
+    #[Route('/{id}/delete_card_allpara', name: 'admin_post_delete_card_allpara', methods: ['GET', 'POST'])]
+
+    public function deleteCardAllpara(Request $request, PersistenceManagerRegistry $doctrine)
+    {
+		
+        $card_id = $request->request->get('card_id');
+      
+        $entityManager = $doctrine->getManager();
+       
+        $postcard = $entityManager->getRepository(Postcard::class)->find($card_id);
+       
+        $postcard->setparagraph('');
+        $entityManager->flush(); 
+		
+		$return_arr = array("message" => 'success'); 
+		 
+		echo json_encode($return_arr);
+		die;
     }
    
 }

@@ -62,9 +62,10 @@ $(function () {
 	}
 	var para_count = 2;
 	$(".add_paragraph").click(function(){
-		var html_append = '<div class="form-group">'; 
+		var html_append = '<div class="form-group form_group_'+para_count+'">'; 
 		html_append += '<label class="control-label required" for="post_title">Paragraph '+para_count+'</label>'; 
-		html_append += '<input type="text" name="paragraph[]" required="required" autofocus="autofocus" class="form-control card_paragraph" />';
+		html_append += '<div class="col-sm-11 cus_par"><input type="text" name="paragraph[]" required="required" autofocus="autofocus" class="form-control card_paragraph" /></div>';
+		html_append += '<div class="col-sm-1"><span class="add-delete-buttons"><button type="button" class="add-post-para-delete btn btn-danger btn-sm btn_para_'+para_count+'" para_id = "'+para_count+'"> <i class="fas fa-times-circle"></i></button></span></div>';
 		html_append += '</div>'; 
 		$(".other_paragraph").append(html_append);
 		para_count++;
@@ -163,8 +164,8 @@ $(document).on('submit', 'form[data-confirmation]', function (event) {
     }).modal('show');
   }
 });
-//save post
-$(document).on('click', '#sidebar .btn-success', function (event) {
+//save post old code when click on show post
+/*$(document).on('click', '#sidebar .btn-success', function (event) {
 	event.preventDefault();
 	var post_id = $("#post_id_n").val();
 	var link = $(this).attr('href');    
@@ -191,6 +192,46 @@ $(document).on('click', '#sidebar .btn-success', function (event) {
 	});
 	window.location.href=link;
 	
+});*/
+
+//updated code when click on save
+$(document).on('click', '.post_submit_btn', function (event) {
+	event.preventDefault();
+	var post_id = $("#post_id_n").val();
+	var link = $(this).attr('href');    
+	console.log(link);
+	var card_iddata = [];
+	$('#sortable .inner-card-data').each(function() {		
+		var card_id = $(this).attr('card_id'); 
+		card_iddata.push(card_id);
+	});
+	
+
+	var postForm = { //Fetch form data
+		'post_id'     : post_id,'card_ids'     : card_iddata
+	};
+
+	$.ajax({ //Process the form using $.ajax()
+		type      : 'POST', //Method type
+		url       : '/en/admin/post/'+post_id+'/editpostcardposition', //Your form processing file URL
+		data      : postForm, //Forms name
+		dataType  : 'json',
+		success   : function(data) {
+						
+					}
+	});
+	$(".post_form").submit();
+	//window.location.href=link;
+	
+});
+
+
+//delete paragraph for add
+$(document).on('click', '.add-post-para-delete', function (event) {
+	event.preventDefault();
+	var para_id = $(this).attr('para_id');	
+	$(".form_group_"+para_id).remove();
+	
 });
 
 //delete card para
@@ -199,18 +240,53 @@ $(document).on('click', '.delete-post-para', function (event) {
 	if(confirm("Do you want to delete?")) {
 		var card_id = $(this).attr('data-post-card-id');	
 		var para_id = $(this).attr('para_id');    
-		
+		$(".loader_"+para_id).show();
+		$(".btn_para_"+para_id).hide();
 		var postForm = { //Fetch form data
 			'card_id'     : card_id,'para_id'     : para_id
 		};
-		console.log("xcv");
+		
 		$.ajax({ //Process the form using $.ajax()
 			type      : 'POST', //Method type
 			url       : '/en/admin/post/'+card_id+'/delete_card_para', //Your form processing file URL
 			data      : postForm, //Forms name
 			dataType  : 'json',
 			success   : function(data) {
-							
+				console.log(data);	
+							if(data.message=="success"){
+								$(".loader_"+para_id).hide();
+								$(".btn_para_"+para_id).show();
+								$(".data_"+para_id).remove();
+							}
+						}
+		});
+		$(".loader_"+para_id).hide();
+		$(".btn_para_"+para_id).show();
+		//location.reload();
+	}		
+});
+
+//delete card allpara
+$(document).on('click', '.delete-all-para', function (event) {
+	event.preventDefault();
+	if(confirm("Do you want to delete?")) {
+		
+		var card_id = $(this).attr('data-post-card-id');	
+		
+		var postForm = { //Fetch form data
+			'card_id'     : card_id
+		};
+		console.log("xcv");
+		$.ajax({ //Process the form using $.ajax()
+			type      : 'POST', //Method type
+			url       : '/en/admin/post/'+card_id+'/delete_card_allpara', //Your form processing file URL
+			data      : postForm, //Forms name
+			dataType  : 'json',
+			success   : function(data) {
+				console.log(data);	
+							if(data.message=="success"){
+								$(".data_"+para_id).remove();
+							}
 						}
 		});
 		location.reload();

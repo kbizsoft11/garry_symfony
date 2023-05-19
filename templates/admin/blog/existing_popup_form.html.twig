@@ -7,6 +7,7 @@
             <!--<span class="close">&times;</span>-->
             {{ form_start(card_form, {'action': path('admin_post_card_edit', {'id': cards.card_id}),attr: attr|default({})}) }}
 			  <input type="hidden" value="{{post_id_card}}" id="post_id_n" name="post_id" required="required" class="form-control">
+			  
               <div class="form-group">
                     <label class="control-label required" for="card_post_cardTitle">Card Title</label> 
                     <input type="text" value="{{cards.card_title}}" id="card_post_cardTitle" name="cardTitle" required="required" class="form-control">
@@ -18,17 +19,21 @@
                </div>
                     {% set count_para = 0 %}
                     {% for key,card_para in cards.paragraph_n %}
-                         <div class="form-group">
-                            {% set count_para = count_para + 1 %}
+						{% set count_para = count_para + 1 %}
+                        <div class="form-group data_{{count_para}}">
                             <label class="control-label required" for="post_title">Paragraph {{count_para}}</label> 
                             <div class="col-sm-11 cus_par">
 								<input type="text" name="paragraph[]" value="{{card_para}}" required="required" autofocus="autofocus" class="form-control card_paragraph" />
 							</div>
+							{% if(count_para!=1) %}
 							<div class="col-sm-1">
 								<span class="card-delete-buttons">                          
-									<button type="button" class="delete-post-para btn btn-danger btn-sm" para_id = "{{count_para}}" data-post-card-id="{{ cards.card_id}}"> <i class="fas fa-times-circle"></i></button>
+									<button type="button" class="delete-post-para btn btn-danger btn-sm btn_para_{{ count_para}}" para_id = "{{count_para}}" data-post-card-id="{{ cards.card_id}}"> <i class="fas fa-times-circle"></i></button>
+									<div class="loader loader_{{count_para}}"></div>
 								</span>
+								
 							</div>
+							{% endif %}
                         </div>
                     {% endfor %}
 
@@ -43,9 +48,11 @@
                         <option {% if(cards.template=='Template3') %} selected="selected" {% endif %} value="Template3">Template3</option>
                     </select>  
                 </div>
-                
-                
-              
+               
+			    <button type="button" class="add_paragraph {{ button_css|default("btn btn-primary") }}">
+                    Add Paragraph
+                </button>
+			   
                 <button type="submit" class="{{ button_css|default("btn btn-primary") }}">
                     <i class="fa fa-save" aria-hidden="true"></i> {{ button_label|default('label.create_post'|trans) }}
                 </button>
