@@ -25,7 +25,7 @@
             ->add('post_id', HiddenType::class,[
                 'label' => 'Post Id',
             ])	
-			->add('cardImage', TextType::class,[
+			->add('cardImage', FileType::class,[
                 'label' => 'Card Image',
             ])				
 			->add('paragraph', TextType::class,[

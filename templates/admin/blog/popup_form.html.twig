@@ -6,7 +6,8 @@
 		{{ form_start(card_form, {attr: attr|default({})}) }}
 			{{ form_row(card_form.cardTitle) }}
 			{{ form_row(card_form.post_id,{ 'value': post_id_card }) }}
-			{{ form_row(card_form.cardImage) }}
+			{{ form_row(card_form.cardImage ,{attr:{'class': 'card_image'}}) }}
+			
 			<!-- {{ form_row(card_form.paragraph,{ 'name': 'paragraph[]' }) }} -->
 			<div class="form-group">
 				<label class="control-label required" for="post_title">Paragraph 1</label> 

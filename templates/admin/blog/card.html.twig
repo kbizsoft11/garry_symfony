@@ -5,7 +5,7 @@
 
             {{ form_start(card_form, {attr: attr|default({})}) }}
                 {{ form_row(card_form.cardTitle) }}
-                {{ form_row(card_form.cardImage) }}
+                {{ form_row(card_form.cardImage,{attr:{'class': 'card_image'}}) }}
                 {{ form_row(card_form.paragraph,{attr:{'class': 'card_paragraph'}}) }}
                 
                 <div class="other_paragraph"></div>

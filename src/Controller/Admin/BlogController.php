@@ -94,13 +94,6 @@ class BlogController extends AbstractController
         ->add('saveAndCreateNew', SubmitType::class);
 
         $card_form->handleRequest($request);
-        //gettitlecard
-        
-       
-        // the isSubmitted() method is completely optional because the other
-        // isValid() method already checks whether the form is submitted.
-        // However, we explicitly add it to improve code readability.
-        // See https://symfony.com/doc/current/forms.html#processing-forms
 
         /***code for card save data start */
         
@@ -114,38 +107,32 @@ class BlogController extends AbstractController
             
             $getpost_id = $post->getId();
            
-
-            // Flash messages are used to notify the user about the result of the
-            // actions. They are deleted automatically from the session as soon
-            // as they are accessed.
-            // See https://symfony.com/doc/current/controller.html#flash-messages
             $this->addFlash('success', 'post.created_successfully');
 
             /** @var SubmitButton $submit */
-            $submit = $form->get('saveAndCreateNew'); 
-
+            $submit = $form->get('saveAndCreateNew'); 	
+            $cart_content_count = $request->request->get('card_data');
+        
+            $cart_content_count = $request->request->get('card_data');
+            $key_item = $_REQUEST['key_item'];
 			
-            $cart_content_count = $request->request->get('card_data');
-            //save card data to new table
-            $cart_content_count = $request->request->get('card_data');
             if($getpost_id!=''){
                 if($cart_content_count!=''){
                     $cart_content_count = $request->request->get('card_data');
-                    for($ik = 1; $ik<=$cart_content_count;$ik++){
-
-                        $card_title = $request->request->get('card_title'.$ik);
-                        $card_image = $request->request->get('card_image'.$ik);
-                       /*  $card_image = $request->request->get('card_image'.$ik)->getData();
-						echo "<pre>";
-						print_r($card_image);
-						die; */
-						//$brochureFile = $request->request->get('brochure')->getData();
-                        $card_paragraph = $request->request->get('card_paragraph'.$ik);
-                        $card_template = $request->request->get('card_template'.$ik);
+                    for($ik = 1; $ik<$cart_content_count;$ik++){
+						$vl = $ik-1;						
+						$key_item_vl = $key_item[$vl];
+						//echo $key_item_vl.'<br/>';
+                        $card_title = $request->request->get('card_title'.$key_item_vl);
+						
+                        $card_image = $request->request->get('card_image'.$key_item_vl);
+                      
+                        $card_paragraph = $request->request->get('card_paragraph'.$key_item_vl);
+                        $card_template = $request->request->get('card_template'.$key_item_vl);
                         $create_para_ary = explode(',',$card_paragraph);
                     
-                        $json_paragraph = json_encode($create_para_ary);
-
+                        $json_paragraph = json_encode($create_para_ary);					
+						
                         $post_card = new PostCard();
                         $post_card->setCardTitle($card_title);
                         $post_card->setcardImage($card_image);
@@ -159,6 +146,7 @@ class BlogController extends AbstractController
                     
                 }
             }
+			
             /***code for card save data end */
 
             if ($submit->isClicked()) {
@@ -215,9 +203,30 @@ class BlogController extends AbstractController
     #[IsGranted('edit', subject: 'post', message: 'Posts can only be edited by their authors.')]
     public function edit(Request $request, Post $post, EntityManagerInterface $entityManager): Response
     {
+		
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
+		$file_url='';
+		$upload_directory = 'images/';
+		
+		if(isset($_FILES['card_post'])){
+			
+			$baseurl = $request->getScheme() . '://' . $request->getHttpHost() . $request->getBasePath();
+	
+			$path_parts = pathinfo($_FILES['card_post']["name"]["cardImage"]);
+			$extension = $path_parts['extension'];
 
+			$filename = date('m-d-Y_H_i_s').'.'.$extension;		
+			$target=$upload_directory.basename($filename);
+			
+			if(move_uploaded_file($_FILES['card_post']['tmp_name']["cardImage"],$target)){				
+				$file_url = $baseurl.'/'.$upload_directory.$filename;						
+			}
+		}
+		
+		
+		
+		
         $postcard = new PostCard();
         $second_form = $this->createForm(CardPostType::class, $postcard);
         $second_form->handleRequest($request);
@@ -229,6 +238,7 @@ class BlogController extends AbstractController
             return $this->redirectToRoute('admin_post_edit', ['id' => $post->getId()]);
         }
 
+		
         
         
         $data = $second_form->getData();
@@ -239,13 +249,15 @@ class BlogController extends AbstractController
             $paragraph_new = json_encode($paragraph);
            
             $postcard->setPostId($post_id);
-            
+            if($file_url!=''){
+				$postcard->setCardImage($file_url); 
+			}
             $postcard->setParagraph($paragraph_new);  
             $entityManager->persist($postcard);
             $entityManager->flush();
 
             return $this->redirectToRoute('admin_post_edit', ['id' => $post->getId()]);
-        }
+        } 
 
         $repository = $entityManager->getRepository(PostCard::class);
         // get by postid
@@ -318,6 +330,7 @@ class BlogController extends AbstractController
 
     public function editPostCard(Request $request, PersistenceManagerRegistry $doctrine, $id)
     {
+		
         $entityManager = $doctrine->getManager();
         $postcard = $entityManager->getRepository(Postcard::class)->find($id);
 
@@ -333,18 +346,36 @@ class BlogController extends AbstractController
         
         $paragraph = $_REQUEST['paragraph'];
         $paragraph_new = json_encode($paragraph);
-
-       
-        $card_image = $_REQUEST["cardImage"];
+		$card_image='';
+        
         $paragraph = $_REQUEST["paragraph"];
         $template = $_REQUEST["template"];
        
         $post_id = $_REQUEST["post_id"];
         $paragraph_new = json_encode($paragraph);
-       
-      
+
+		if(isset($_FILES['card_post_image'])){
+			
+			$upload_directory = 'images/';
+		
+			$baseurl = $request->getScheme() . '://' . $request->getHttpHost() . $request->getBasePath();
+		
+			$path_parts = pathinfo($_FILES["card_post_image"]["name"]);
+			/* echo"<pre>";
+			print_r($path_parts); */
+			$extension = $path_parts['extension'];
+
+			$filename = date('m-d-Y_H_i_s').'.'.$extension;		
+			$target=$upload_directory.basename($filename);	
+			if(move_uploaded_file($_FILES['card_post_image']['tmp_name'],$target)){				
+				$file_url = $baseurl.'/'.$upload_directory.$filename;	
+				$postcard->setcardImage($file_url);
+			}
+			
+		}
+		
         $postcard->setCardTitle($card_title);
-        $postcard->setcardImage($card_image);
+        
         $postcard->setparagraph($paragraph_new);
         $postcard->setTemplate($template);
         $entityManager->flush(); 
@@ -401,13 +432,29 @@ class BlogController extends AbstractController
 
     public function cardImage(Request $request, PersistenceManagerRegistry $doctrine)
     {
-		$filename = $_FILES['file']['name'];
-		$target='images/'.basename($_FILES['file']['name']);
+		$upload_directory = 'images/';
+		
+		$baseurl = $request->getScheme() . '://' . $request->getHttpHost() . $request->getBasePath();
+	
+		$path_parts = pathinfo($_FILES["file"]["name"]);
+		$extension = $path_parts['extension'];
+
+		$filename = date('m-d-Y_H_i_s').'.'.$extension;		
+		$target=$upload_directory.basename($filename);
+		
 		if(move_uploaded_file($_FILES['file']['tmp_name'],$target)){
-			$status = 1;             				
+			$status = 1;  
+			$file_url = $baseurl.'/'.$upload_directory.$filename;
+			$json_data = array("image_url"=>$file_url);
+			
+			echo json_encode( $json_data );
+			die;
+		} else{
+			$json_data = array("image_url"=>'');
+			echo json_encode( $json_data );
+			die;
 		}
-		echo"done";
-		die;
+		
     }
 	
 	//delete all paragraph of cards

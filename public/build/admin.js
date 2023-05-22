@@ -52,9 +52,9 @@ $(function () {
 	var span = document.getElementsByClassName("close")[0];
 
 	btn.onclick = function() {
-		console.log("kushal add");
 		
 		modal.style.display = "block";
+		$('.card_paragraph,.card_post_template,#card_post_template,#card_post_cardTitle,.card_image').val('');
 	}
  
 	span.onclick = function() {
@@ -71,20 +71,17 @@ $(function () {
 		para_count++;
 	});
     var cart_content_count = 1;
-	$(document).on('click', '.add_card_post', function(){ 
-		var gettitle = $('#card_post_cardTitle').val();
-		var card_post_cardImage = $('#card_post_cardImage').val();
+	
+	function response_img_data(imgresponse,cart_content_count){
 		var card_paragraph = $('.card_paragraph').val();
 		var card_post_template = $('#card_post_template').val();
-		
-		console.log(gettitle);
-		
-		if(gettitle=='' || card_post_cardImage=='' || card_paragraph=='' || card_post_template==''){
+		var gettitle = $('#card_post_cardTitle').val();
+		var card_post_cardImage = $('.card_image').val();
+		if(gettitle=='' || card_paragraph=='' || card_post_template==''){
 			$('#modal_card_post .error').text("Please fill all fields data");
 			return false;
 		}
-
-		//data append
+		
 		console.log(cart_content_count);
 		var card_paradata = [];
 
@@ -94,17 +91,18 @@ $(function () {
 		});
 		
 		var para_data = card_paradata.toString();
-
+		console.log('kushal response.image_url'+imgresponse);
 		var html_append = '<div class="form-group">';  
 		html_append += '<input type="hidden" class="control-label required card_data_count" name="card_data" value='+cart_content_count+'>'; 
 		html_append += '<input type="hidden" class="control-label required" name="card_title'+cart_content_count+'" value="'+gettitle+'">';
-		html_append += '<input type="hidden" class="control-label required" name="card_image'+cart_content_count+'" value="'+card_post_cardImage+'">'; 
+		html_append += '<input type="hidden" class="control-label required" name="card_image'+cart_content_count+'" value="'+imgresponse+'">'; 
 		html_append += '<input type="hidden" class="control-label required" name="card_paragraph'+cart_content_count+'" value="'+para_data+'">'; 
 		html_append += '<input type="hidden" class="control-label required" name="card_template'+cart_content_count+'" value="'+card_post_template+'">';
+		html_append += '<input type="hidden" class="control-label required" name="key_item[]" value="'+cart_content_count+'">';
 		html_append += '</div>';
 		html_append += '<div class="col-sm-4">';
 		html_append += '<div class="inner-card-data">';
-		html_append += '<h4>'+gettitle+'</h4><div class="cars-box-img"><img height="200" src="'+card_post_cardImage+'" class="img-rounded" alt="'+gettitle+'"></div>';
+		html_append += '<div class="cars-box-img"><img height="200" src="'+imgresponse+'" class="img-rounded" alt="'+gettitle+'"></div>';
 		html_append += '<div class="card-box-content">';
 		html_append += '<p>'+card_paragraph+'</p>';
 		html_append += '</div>';
@@ -115,7 +113,53 @@ $(function () {
 		html_append += '</div>';
 		var card_post_template = $('.card_data_count').val(cart_content_count);
 		$(".card_content_add").append(html_append);
-		cart_content_count++;
+		
+		
+		$(".close").trigger('click');
+	}
+	
+	$(document).on('click', '.add_card_post', function(){ 
+	
+		
+		
+		var fd = new FormData();
+		//var file_data = $('#card_post_cardImage').prop('files')[0];
+		var files = $('#card_post_cardImage')[0].files;
+		
+		var file_data = $('#card_post_cardImage').prop('files')[0]; 
+		console.log(file_data);
+		//if(file_data==''){
+		if(typeof(file_data)  === "undefined") {
+			$('#modal_card_post .error').show();
+			console.log('false');
+			$('#modal_card_post .error').text("Please add correct image");
+			return false;
+		}
+		console.log('true');
+		if(files.length > 0 ){			
+				var filename = $('input[type=file]').val().replace(/.*(\/|\\)/, '');
+				var output = filename.replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-');
+				
+				var card_post_cardImage = $('#card_post_cardImage').val('');
+			    var image_url = window.location.origin+'/images/'+filename;
+				var imgresponse = ''
+               fd.append('file',file_data);
+               $.ajax({
+                    url:'/en/admin/post/card_image',
+                    type:'post',
+                    data:fd,
+                    dataType: 'json',
+                    contentType: false,
+                    processData: false,
+                    success:function(response){
+						imgresponse = response.image_url;
+						response_img_data(imgresponse,cart_content_count)                        
+                    }
+               });
+          }
+		  
+			cart_content_count++;
+		
 		
 	});
 
@@ -193,6 +237,9 @@ $(document).on('submit', 'form[data-confirmation]', function (event) {
 	window.location.href=link;
 	
 });*/
+
+
+		
 
 //updated code when click on save
 $(document).on('click', '.post_submit_btn', function (event) {
@@ -291,6 +338,16 @@ $(document).on('click', '.delete-all-para', function (event) {
 		});
 		location.reload();
 	}		
+});
+
+//update image field card data
+
+$(document).on('click', '.existing_img_update', function (event) {
+	jQuery(".update_image").slideToggle();
+	console.log("sdfsd");
+});
+$(document).on('click', '.delete-update-img', function (event) {
+	jQuery(".update_image").hide();
 });
 
 /***/ }),
