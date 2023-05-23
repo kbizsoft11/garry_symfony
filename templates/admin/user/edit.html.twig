@@ -1,0 +1,41 @@
+
+{% extends 'admin/layout.html.twig' %}
+
+{% block body_id 'admin_user_edit' %}
+
+{% block main %}
+    <h1>{{ 'Edit'|trans  }}</h1>
+    {{ form_start(form) }}
+            {{ form_row(form.email) }}
+            {{ form_row(form.fullName) }}
+            {{ form_row(form.username) }}
+			
+
+            {#{ form_widget(form.password,  {'label_attr  ':{'type':'hidden'}}) }#}
+            <input
+                name="{{ field_name(form.password) }}"
+                value="{{ field_value(form.password) }}"
+                placeholder="{{ field_label(form.password) }}"
+                class="form-control"
+            />
+            <button type="submit" class="btn btn-primary">
+                <i class="fa fa-save" aria-hidden="true"></i> {{ 'action.save'|trans }}
+            </button>
+    {# don't render unrendered fields #}
+	{{ form_rest(form) }}
+    {{ form_end(form, {'render_rest': false}) }}
+{% endblock %}
+
+{% block sidebar %}
+    <div class="section actions">
+        <a href="{{ path('admin_add_user') }}" class="btn btn-lg btn-block btn-success">
+            <i class="fa fa-plus" aria-hidden="true"></i> {{ ' Add User'|trans }}
+        </a>
+    </div>
+
+    <!-- <div class="section actions">
+        {#{ include('admin/user/_delete_form.html.twig') }#}
+    </div> -->
+
+    {{ parent() }}
+{% endblock %}

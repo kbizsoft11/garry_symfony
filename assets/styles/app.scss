@@ -382,3 +382,134 @@ body#blog_search .post-metadata {
   font-size: 16px;
   margin-bottom: 8px;
 }
+
+/*css for popup cards*/
+.rest_content{
+	clear:both;
+}
+#modal_card_post .error{
+	color:red;
+}
+.ad_layout{
+	margin: 13px 10px 13px 15px;
+}
+.inner-card-data h4{
+	margin: 13px 10px 13px 15px;
+}
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 999; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 100%;
+}
+
+#modal_card_post .modal-content{
+  width:40%;
+}
+
+/* The Close Button */
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+.border {
+  display: inline-block;
+  width: 33.33%;
+  height: 70px;
+  margin: 6px;
+}
+.cards-row{
+  margin-right: -15px;
+  margin-left: -15px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  row-gap: 30px;
+}
+/*#post_addNewCard{
+  margin-top: 256px;
+}*/
+
+.card-delete-buttons{
+  position: absolute;
+  left: auto;
+  z-index: 9;
+  right: 0;
+}
+
+.modal-content-card-edit{
+    width:100%;
+}
+.modal-backdrop{
+    z-index:0;
+    background-color:none;
+}
+.inner-card-data {
+  border: 1px solid #000;
+  border-radius: 5px;
+  position: relative;
+  margin-bottom:20px;
+}
+.cars-box-img img {
+  width: 100%;
+}
+
+.card-box-content {
+  padding: 15px;
+}
+
+.modal_cards{
+  z-index: 999;
+}
+.custom_add_post_model button{
+  display:none;
+}
+.col-sm-11.cus_par{
+  padding-left:0px;
+} 
+
+.loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 100%;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+  display:none;
+}
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

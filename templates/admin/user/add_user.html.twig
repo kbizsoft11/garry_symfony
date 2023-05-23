@@ -1,0 +1,29 @@
+{# templates/admin/user/add_user.html.twig #}
+{% extends 'admin/layout.html.twig' %}
+
+{% block body_id 'admin_add_user' %}
+
+{% block main %}
+    <h1>Add User</h1>
+
+
+
+    <!-- <form action="{{ path('admin_add_user') }}" method="POST"> -->
+        {{ form_start(form) }}
+
+            {{ form_row(form.fullName) }}
+
+            {{ form_row(form.email) }}
+            {{ form_row(form.username ) }}
+            {{ form_row(form.password ) }}
+
+            <button type="submit" class="btn btn-primary">Add User</button>
+    <!-- </form> -->
+        {{ form_end(form) }}
+
+
+{% endblock %}
+
+{% block sidebar %}
+    {{ parent() }}
+{% endblock %}
